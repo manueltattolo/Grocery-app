@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: grocery_db
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: admin
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+            requests:
+              cpu: "0.5"
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: init-sql
+          configMap:
+            name: postgres-init-sql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# config-map for init.sql
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+data:
+  init.sql: |
+    DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'grocery_db') THEN
+            CREATE DATABASE grocery_db;
+        END IF;
+    END $$;
+
+    \c grocery_db;
+
+    CREATE TABLE IF NOT EXISTS grocery (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        items VARCHAR(200) NOT NULL
+    );
+    create user datadog with password 'datadog';
+    grant pg_monitor to datadog;
+    grant SELECT ON pg_stat_database to datadog;
+
+    INSERT INTO grocery (name, items) VALUES ('John', 'Apples, Bananas, Milk');
+    INSERT INTO grocery (name, items) VALUES ('Alice', 'Eggs, Bread, Cheese');
+    INSERT INTO grocery (name, items) VALUES ('Bob', 'Chicken, Rice, Vegetables');
