@@ -18,7 +18,7 @@ Datadog monitoring including Infra, APM, Application and Infra Logs, Database Mo
 
 ## Prerequisites
 Before setting up the Grocery-app, ensure that the following tools are installed and configured on your machine:
-- Docker
+- Docker and access to your Docker repository for pushing the image
 - Kubernetes
 - Minikube
 - Helm (for Datadog Operator installation)
@@ -26,7 +26,7 @@ Before setting up the Grocery-app, ensure that the following tools are installed
 ## Installation Steps
 1. **Start Minikube:**
    ```bash
-   minikube start```
+   minikube start
    
 2. **Build the Docker image**: Navigate to the Flask app directory and build the Docker image:
 
