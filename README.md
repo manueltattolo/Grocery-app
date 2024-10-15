@@ -26,7 +26,7 @@ Before setting up the Grocery-app, ensure that the following tools are installed
 ## Installation Steps
 1. **Start Minikube:**
    ```bash
-   minikube start
-```
+   minikube start```
+   
 2. **Build the Docker image**: Navigate to the Flask app directory and build the Docker image:
 
