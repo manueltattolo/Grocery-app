@@ -5,9 +5,7 @@ This distribution contains all the components from both the [OpenTelemetry Colle
 ## Project Overview
 The Grocery-app is a Flask web application deployed on Kubernetes using Minikube. It utilizes a custom Docker image for deployment and integrates comprehensive monitoring through Datadog. This setup allows for infrastructure monitoring, Application Performance Monitoring (APM), database monitoring, and the collection of application logs, providing a robust solution for real-time application insights.
 
-<img width="642" alt="Screenshot 2024-10-15 at 12 03 05" src="https://github.com/user-attachments/assets/7e5854af-7fea-4c51-b4fc-b0fe4fe959e3">
-<img width="581" alt="Screenshot 2024-10-15 at 12 03 31" src="https://github.com/user-attachments/assets/dbd257f1-f29c-4967-a783-53ee4d0bfe9e">
-<img width="780" alt="Screenshot 2024-10-15 at 12 03 48" src="https://github.com/user-attachments/assets/0890d539-9753-42bc-8d65-eae6ec42dfee">
+<img width="581" alt="Add Item" src="https://github.com/user-attachments/assets/7e5854af-7fea-4c51-b4fc-b0fe4fe959e3"><img width="581" alt="Confirmation Message" src="https://github.com/user-attachments/assets/dbd257f1-f29c-4967-a783-53ee4d0bfe9e"><img width="581" alt="View List" src="https://github.com/user-attachments/assets/0890d539-9753-42bc-8d65-eae6ec42dfee">
 
 
 
