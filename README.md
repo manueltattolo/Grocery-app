@@ -23,3 +23,10 @@ Before setting up the Grocery-app, ensure that the following tools are installed
 - Minikube
 - Helm (for Datadog Operator installation)
 
+## Installation Steps
+1. **Start Minikube:**
+   ```bash
+   minikube start
+```
+2. **Build the Docker image**: Navigate to the Flask app directory and build the Docker image:
+
