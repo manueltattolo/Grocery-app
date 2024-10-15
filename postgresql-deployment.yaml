@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:latest
+          image: postgres:16
           env:
             - name: POSTGRES_DB
               value: grocery_db

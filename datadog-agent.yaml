@@ -19,7 +19,8 @@ spec:
       enabled: true
     logCollection:
       enabled: true
-      containerCollectAll: false
+      containerCollectAll: true
+      containerCollectUsingFiles: true
     clusterChecks:
       enabled: true
       useClusterChecksRunners: true
@@ -48,6 +49,4 @@ spec:
                 port: 5432              
                 username: "datadog"
                 password: "datadog"
-
-
-
+                reported_hostname: postgres_grocery

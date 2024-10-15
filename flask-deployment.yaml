@@ -13,41 +13,45 @@ spec:
     metadata:
       annotations:
         author: "Manuel"
+        ad.datadoghq.com/tags: '{"team":"sre"}'
+        ad.datadoghq.com/dummy-container.checks: |
+          {
+            "nginx": {
+              "init_config": {},
+              "instances": [
+                {
+                  "nginx_status_url":"http://%%host%%:81/nginx_status/"
+                }
+              ]
+            }
+          }      
         ad.datadoghq.com/flask-app.logs: |
           [{
             "source": "flask",
             "service": "grocery-app",
             "tags": ["list:mum_list"],
-            "log_processing_rules": [{
-              "type": "exclude_at_match",
-              "name": "exclude_handlers_logs",
-              "pattern": "244"
-            }]
+            # "log_processing_rules": [{
+            #   "type": "exclude_at_match",
+            #   "name": "exclude_handlers_logs",
+            #   "pattern": "244"
+            # }]
           }]
       labels:
         app: flask-app
         tags.datadoghq.com/service: "panda"
-        tags.datadoghq.com/flask-app.service: "grocery"
-        tags.datadoghq.com/dummy-container.service: "test2"
         admission.datadoghq.com/enabled: "true" # Enable Admission Controller to mutate new pods part of this deployment
     spec:
       containers:
         - name: flask-app
-          image: localhost:5000/flask-app:latest
+          image: manueltattolo/flask-app:latest
           ports:
             - containerPort: 5000
           env:
-          - name: DD_SERVICE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/flask-app.service']
-          - name: DD_TRACE_DEBUG
-            value: "true"      
           - name: DD_TRACE_AGENT_URL
             value: 'unix:///var/run/datadog/apm.socket'  
           volumeMounts:
-          - name: apmsocketpath
-            mountPath: /var/run/datadog  
+            - name: apmsocketpath
+              mountPath: /var/run/datadog  
           resources:
             limits:
               cpu: "0.5"
@@ -55,20 +59,24 @@ spec:
         - name: dummy-container
           image: nginx:latest
           ports:
-            - containerPort: 80
-          env:
-          - name: DD_SERVICE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/dummy-container.service']
+            - containerPort: 80  # Expose the web interface
+            - containerPort: 81  # Expose the metrics endpoint
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/status.conf
+              subPath: status.conf
+              readOnly: true
+              name: "config"  # Mount the custom NGINX config for metrics
           resources:
             limits:
               cpu: "0.1"
-              memory: "128Mi"      
+              memory: "128Mi"
       volumes:
         - hostPath:
             path: /var/run/datadog/
           name: apmsocketpath
+        - name: "config"  # Mounting the ConfigMap containing NGINX configuration
+          configMap:
+            name: "nginx-conf"  # Reference the ConfigMap
 ---
 apiVersion: v1
 kind: Service
@@ -83,5 +91,21 @@ spec:
       port: 80
       targetPort: 5000
       nodePort: 30000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  status.conf: |
+    server {
+      listen 81;
 
+      location /nginx_status {
+        stub_status on;
+      }
 
+      location / {
+        return 404;
+      }
+    }
