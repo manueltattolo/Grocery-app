@@ -34,3 +34,49 @@ Navigate to the Flask app directory. Build the Docker image with tag:
 docker build -t yourdockerhubusername/flask-app:latest .
 ```
 
+3. **Push the Docker image to Docker Hub**
+After tagging the image, push it to your Docker Hub repository:
+
+```bash
+docker push yourdockerhubusername/flask-app:latest
+```
+
+4. **Deploy the application**
+Apply the Kubernetes configurations. Make sure your deployment YAML files refer to the correct image:
+
+```bash
+kubectl apply -f flask-deployment.yaml
+kubectl apply -f postgresql-deployment.yaml
+```
+
+5. **Install the Datadog Agent**
+First, add the Datadog Helm repository and install the Datadog Operator:
+
+```bash
+helm repo add datadog https://helm.datadoghq.com
+helm install datadog-operator datadog/datadog-operator
+kubectl create secret generic datadog-secret --from-literal api-key=<DATADOG_API_KEY>
+```
+Then, apply the Datadog agent configuration:
+
+```bash
+kubectl apply -f datadog-agent.yaml
+```
+6. **Access the application service in minikube**
+```bash
+minikube service flask-nodeport-service --url
+```
+
+**Configuration**
+Ensure that the Flask application and PostgreSQL service are configured correctly with the right environment variables and settings as specified in the deployment files. Configure the Datadog agent by modifying datadog-agent.yaml if necessary, to match your monitoring and logging requirements.
+
+**Usage**
+Access the web application via the NodePort exposed by Minikube or through any configured ingress. Use the application to manage grocery lists, with functionalities to add, delete, and view items.
+
+**Monitoring**
+With Datadog integrated, you can monitor:
+
+- Infrastructure metrics
+- Application performance
+- Database operations
+- Real-time logs
