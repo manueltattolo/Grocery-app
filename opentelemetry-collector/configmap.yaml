@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-agent-conf
+  labels:
+    app: opentelemetry
+    component: otel-agent-conf
+data:
+  otel-agent-config: |
+    receivers:
+      kubeletstats:
+        collection_interval: 10s
+        auth_type: "serviceAccount"
+        endpoint: "192.168.49.2:10250"
+        insecure_skip_verify: true
+        metric_groups:
+          - node
+          - pod
+          - container
+      otlp:
+        protocols:
+          http:
+            endpoint: 0.0.0.0:4318
+          grpc:
+            endpoint: 0.0.0.0:4317
+      hostmetrics:
+        # collect metrics every 10 seconds.
+        collection_interval: 10s
+        scrapers:
+          paging:
+            metrics:
+              system.paging.utilization:
+                enabled: true
+          cpu:
+            metrics:
+              system.cpu.utilization:
+                enabled: true
+          disk:
+          filesystem:
+            metrics:
+              system.filesystem.utilization:
+                enabled: true
+          load:
+          memory:
+          network:
+          processes:
+    exporters:
+      datadog:
+        api:
+          key: <DatadogAPIKey>
+    processors:
+      resourcedetection:
+        # ensures host.name and other important resource tags 
+        # get picked up
+        detectors: [system, env, docker]
+        timeout: 5s
+        override: false
+      # adds various tags related to k8s
+      k8sattributes:
+      batch:
+        timeout: 10s
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp, hostmetrics, kubeletstats]
+          processors: [resourcedetection, k8sattributes, batch]
+          exporters: [datadog]
+        traces:
+          receivers: [otlp]
+          processors: [resourcedetection, k8sattributes, batch]
+          exporters: [datadog]
