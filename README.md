@@ -71,4 +71,4 @@ minikube service flask-nodeport-service --url
 
 **Configuration**
 
-Ensure that the Flask application and PostgreSQL service are configured correctly with the right annotations for the logs and integrations you want to monitor. Configure the Datadog agent by modifying the main agent configuration file ``datadog-agent.yaml`` if necessary, to match your monitoring and logging requirements. In my case, I have used a [clustercheck runner](https://docs.datadoghq.com/containers/guide/clustercheckrunners/?tab=datadogoperator).
+Ensure that the Flask application and PostgreSQL service are configured correctly with the right annotations for any logs and integrations you want to monitor. Configure the Datadog agent by modifying the main agent configuration file ``datadog-agent.yaml`` if necessary, to match your monitoring and logging requirements. In my setup, I've utilized a [Cluster Check Runner](https://docs.datadoghq.com/containers/guide/clustercheckrunners/?tab=datadogoperator), which is especially recommended for monitoring external services like managed databases, although it's not specifically used for this app.
