@@ -18,8 +18,8 @@ spec:
     orchestratorExplorer:
       enabled: true
     logCollection:
-      enabled: true
-      containerCollectAll: true
+      enabled: false
+      containerCollectAll: false
       containerCollectUsingFiles: true
     clusterChecks:
       enabled: true
@@ -31,7 +31,30 @@ spec:
           value: "false"
         - name: "DD_IGNORE_AUTOCONF"
           value: "etcd kube_scheduler kube_controller_manager"
-        
+        - name: "DD_LOGS_CONFIG_AUTO_MULTI_LINE_DETECTION"
+          value: "true"  
+      containers:
+        agent:
+          volumeMounts: 
+            - name: pointdir
+              mountPath: /opt/datadog-agent/run
+            - name: auditdir
+              mountPath: /var/log/kubernetes/apiserver
+            - name: dd-agent-config
+              mountPath: /etc/datadog-agent/conf.d/kubernetes_audit.d
+      volumes: 
+        - name: pointdir
+          hostPath:
+            path: /opt/datadog-agent/run
+        - name: auditdir
+          hostPath:
+            path: /var/log/kubernetes/apiserver
+        - name: dd-agent-config
+          configMap:
+            name: dd-agent-config
+            items:
+              - key: kubernetes-audit-log
+                path: conf.yaml        
     clusterAgent:
       replicas: 1
       extraConfd:
@@ -50,3 +73,17 @@ spec:
                 username: "datadog"
                 password: "datadog"
                 reported_hostname: postgres_grocery
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dd-agent-config
+  namespace: default
+data:
+  kubernetes-audit-log: |-
+    logs:
+      - type: file
+        path: /var/log/kubernetes/apiserver/audit.log
+        source: kubernetes.audit
+        service: audit

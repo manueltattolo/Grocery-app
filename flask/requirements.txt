@@ -4,3 +4,5 @@ psycopg2==2.8.6
 structlog==24.1.0
 datetime
 ddtrace==2.9.2
+flake8
+pytest

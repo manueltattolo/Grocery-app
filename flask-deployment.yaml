@@ -46,6 +46,7 @@ spec:
           image: manueltattolo/flask-app:latest
           ports:
             - containerPort: 5000
+          imagePullPolicy: Always  
           env:
           - name: DD_TRACE_AGENT_URL
             value: 'unix:///var/run/datadog/apm.socket'  
