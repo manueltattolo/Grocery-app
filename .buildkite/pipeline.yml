@@ -1,0 +1,24 @@
+steps:
+  - label: "🔍 Lint & Test"
+    command: |
+      pip install -r flask/requirements.txt
+      flake8 flask/
+      pytest flask/
+    key: test
+
+  - label: "🐳 Build & Push Docker Image to Docker Hub"
+    command: |
+      export IMAGE_TAG=$(git rev-parse --short HEAD)
+      docker build -t manueltattolo/flask-app:$IMAGE_TAG .
+      echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      docker push manueltattolo/flask-app:$IMAGE_TAG
+    key: build
+    depends_on: test
+
+  - label: "🚀 Deploy to Minikube"
+    command: |
+      export IMAGE_TAG=$(git rev-parse --short HEAD)
+      kubectl config use-context minikube
+      kubectl set image deployment/flask-app flask-app=manueltattolo/flask-app:$IMAGE_TAG
+    key: deploy
+    depends_on: build
