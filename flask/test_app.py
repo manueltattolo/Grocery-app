@@ -1,12 +1,11 @@
 import pytest
-from flask import url_for
 from app import app, db, Grocery
 
 
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # use in-memory DB
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     with app.app_context():
         db.create_all()
         yield app.test_client()
@@ -21,7 +20,8 @@ def test_post_index_creates_grocery_and_redirects(client):
     }, follow_redirects=False)
 
     assert response.status_code == 302
-    assert "/success/TestUser/Apples,%20Milk" in response.headers["Location"]
+    expected_url = "/success/TestUser/Apples,%20Milk"
+    assert expected_url in response.headers["Location"]
 
     grocery = Grocery.query.first()
     assert grocery is not None
