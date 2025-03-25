@@ -8,17 +8,15 @@ steps:
 
   - label: "🐳 Build & Push Docker Image to Docker Hub"
     command: |
-      IMAGE_TAG=${BUILDKITE_COMMIT:0:7}
-      docker build -t manueltattolo/flask-app:$IMAGE_TAG .
+      docker build -t manueltattolo/flask-app:${BUILDKITE_COMMIT:0:7} .
       echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      docker push manueltattolo/flask-app:$IMAGE_TAG
+      docker push manueltattolo/flask-app:${BUILDKITE_COMMIT:0:7}
     key: build
     depends_on: test
 
   - label: "🚀 Deploy to Minikube"
     command: |
-      IMAGE_TAG=${BUILDKITE_COMMIT:0:7}
       kubectl config use-context minikube
-      kubectl set image deployment/flask-app flask-app=manueltattolo/flask-app:$IMAGE_TAG
+      kubectl set image deployment/flask-app flask-app=manueltattolo/flask-app:${BUILDKITE_COMMIT:0:7}
     key: deploy
     depends_on: build
