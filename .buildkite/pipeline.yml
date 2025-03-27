@@ -9,7 +9,7 @@ steps:
   - label: "🐳 Build & Push Docker Image to Docker Hub"
     command: |
       docker build -t manueltattolo/flask-app:${BUILDKITE_COMMIT:0:7} -f flask/Dockerfile flask
-      echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_TOKEN" --password-stdin
+      echo "$DOCKERHUB_TOKEN" | docker login -u manueltattolo --password-stdin
       docker push manueltattolo/flask-app:${BUILDKITE_COMMIT:0:7}
     key: build
     depends_on: test
