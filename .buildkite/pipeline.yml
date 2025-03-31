@@ -1,14 +1,9 @@
 steps:
   - label: "Test"
     command: |
-      bash -c "
-        set -e
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r flask/requirements.txt
-        flake8 flask/
-        pytest flask/
-      "
+      pip install -r flask/requirements.txt
+      flake8 flask/
+      pytest flask/
     key: test
 
   - label: "Build and push docker image to docker hub"
