@@ -18,7 +18,7 @@ spec:
     orchestratorExplorer:
       enabled: true
     logCollection:
-      enabled: false
+      enabled: true
       containerCollectAll: false
       containerCollectUsingFiles: true
     clusterChecks:
@@ -42,6 +42,8 @@ spec:
               mountPath: /var/log/kubernetes/apiserver
             - name: dd-agent-config
               mountPath: /etc/datadog-agent/conf.d/kubernetes_audit.d
+            - name: applogs
+              mountPath: /var/log/example
       volumes: 
         - name: pointdir
           hostPath:
@@ -54,7 +56,10 @@ spec:
             name: dd-agent-config
             items:
               - key: kubernetes-audit-log
-                path: conf.yaml        
+                path: conf.yaml
+        - name: applogs
+          persistentVolumeClaim:
+            claimName: applogs-pvc
     clusterAgent:
       replicas: 1
       extraConfd:

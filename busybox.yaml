@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logger
+  namespace: default
+  annotations:
+    ad.datadoghq.com/busybox.logs: |
+      [
+        {
+          "type": "file",
+          "path": "/var/log/example/app.log",
+          "source": "example",
+          "service": "logger-service"
+        }
+      ]
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["/bin/sh", "-c", "--"]
+      args: ["while true; do echo $(date) example file log >> /var/log/example/app.log; sleep 60; done"]
+      volumeMounts:
+        - name: applogs
+          mountPath: /var/log/example
+      resources:
+        limits:
+          cpu: "0.5"
+          memory: "512Mi"
+  volumes:
+    - name: applogs
+      persistentVolumeClaim:
+        claimName: applogs-pvc
